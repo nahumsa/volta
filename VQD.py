@@ -23,16 +23,18 @@ from SWAPTest import measure_swap_test
 ################
 
 # hamiltonian = 1/2*((I^Z) + (Z^I) + 2*( (X^X) + (Y^Y)))
-hamiltonian = 1/2*((Z^I) + (Z^Z))
-
-eigenvalues = classical_solver(hamiltonian)
-print(f"Eigenvalues: {eigenvalues}")
+# hamiltonian = 1/2*((Z^I) + (Z^Z))
+# eigenvalues = classical_solver(hamiltonian)
+# print(f"Eigenvalues: {eigenvalues}")
 
 class VQD(object):
-    """Variational Quantum Deflation algorithm
+    """Variational Quantum Deflation algorithm class.
+
+    Based on https://arxiv.org/abs/1805.08138 .
 
     """
-    def __init__(self, n_qubits: int, n_excited_states: int, beta: float,
+    def __init__(self, n_qubits: int, n_excited_states: int, 
+                 beta: float,
                  optimizer: qiskit.aqua.components.optimizers.Optimizer, 
                  backend: qiskit.providers.BaseBackend,
                  num_shots: int=10000):
@@ -40,7 +42,8 @@ class VQD(object):
 
         Args:
             n_qubits (int): Number of qubits to use with the hardware efficient ansatz.
-            n_excited_states (int): Number of excited states that you want to find the energy.
+            n_excited_states (int): Number of excited states that you want to find the energy
+            if you use 0, then it is the same as using a VQE.
             beta (float): Strenght parameter for the swap test.
             optimizer (qiskit.aqua.components.optimizers.Optimizer): Classical Optimizers 
             from aqua components.
@@ -56,9 +59,10 @@ class VQD(object):
         self.BETA = beta
         
         # Helper Parameters
-        self.n_excited_states = n_excited_states
-        self.n_parameters = self._get_num_parameters(self.n_qubits)
+        self.n_excited_states = n_excited_states + 1
         self.ansatz = self._get_ansatz(n_qubits)
+        self.n_parameters = self._get_num_parameters(self.n_qubits)
+        
         # Logs
         self._states = []
         self._energies = []
@@ -134,6 +138,7 @@ class VQD(object):
         # Hamiltonian
         hamiltonian = self.get_hamiltonian(qc, self.backend, self.NUM_SHOTS)
         
+
         # Fidelity
         fidelity = 0.
         if len(self.states) != 0:
@@ -159,7 +164,24 @@ class VQD(object):
         self._energies.append(energy)
         self._states.append(self._get_varform_params(optimal_params))
     
-    
+    def _reset(self):
+        """Resets the energies and states helper variables.
+        """
+
+        self._energies = []
+        self._states = []
+
+    def run(self, verbose: int=1):
+        
+        self._reset()
+        
+        for i in range(self.n_excited_states):
+            
+            if verbose == 1:
+                print(f"Calculating excited state {i}")
+            
+            self.optimizer_run()
+
 
 ##############        
 ## End code ##
