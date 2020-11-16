@@ -2,6 +2,7 @@ import unittest
 import qiskit
 from qiskit import Aer
 from Observables import *
+from qiskit.aqua.operators import I, X, Y, Z
 
 class TestObservables(unittest.TestCase): 
     def setUp(self):
@@ -17,27 +18,34 @@ class TestObservables(unittest.TestCase):
         
         # YY expectation value of 1
         self.qcY = qiskit.QuantumCircuit(2)        
-        self.qcY.h(range(2))
-        self.qcY.s(range(2))
+        self.qcY.ry(np.pi/2, range(2))
+        # self.qcY.h(range(2))
+        # self.qcY.s(range(2))
         
         
     def test_ZZ(self): 
         want = 1.
-        got = measure_zz(self.qcZ, self.backend)
+        # got = measure_zz(self.qcZ, self.backend)
+        hamiltonian = (Z^Z)
+        got = sample_hamiltonian(hamiltonian, self.backend, self.qcZ)
         decimalPlace = 2
         message = "ZZ measurement not working for state Zero^Zero."
         self.assertAlmostEqual(want, got, decimalPlace, message)
     
     def test_XX(self): 
         want = 1.
-        got = measure_xx(self.qcX, self.backend)
+        # got = measure_xx(self.qcX, self.backend)
+        hamiltonian = (X^X)
+        got = sample_hamiltonian(hamiltonian, self.backend, self.qcX)
         decimalPlace = 2
         message = "XX measurement not working for state Plus^Plus."
         self.assertAlmostEqual(want, got, decimalPlace, message)
     
     def test_YY(self): 
         want = 1.
-        got = measure_yy(self.qcY, self.backend)
+        # got = measure_yy(self.qcY, self.backend)
+        hamiltonian = (Y^Y)
+        got = sample_hamiltonian(hamiltonian, self.backend, self.qcY)
         decimalPlace = 2
         message = "YY measurement not working for state iPlus^iPlus."
         self.assertAlmostEqual(want, got, decimalPlace, message)
