@@ -1,13 +1,15 @@
 import unittest
 import qiskit
-from qiskit import Aer
+from qiskit import BasicAer
 from Observables import *
+from Observables import sample_hamiltonian
 from qiskit.aqua.operators import I, X, Y, Z
+import numpy as np
 
 class TestObservables(unittest.TestCase): 
     def setUp(self):
         # Simulator
-        self.backend = Aer.get_backend("qasm_simulator")
+        self.backend = BasicAer.get_backend("qasm_simulator")
         
         # ZZ expectation value of 1
         self.qcZ = qiskit.QuantumCircuit(2)        
@@ -18,9 +20,8 @@ class TestObservables(unittest.TestCase):
         
         # YY expectation value of 1
         self.qcY = qiskit.QuantumCircuit(2)        
-        self.qcY.ry(np.pi/2, range(2))
-        # self.qcY.h(range(2))
-        # self.qcY.s(range(2))
+        self.qcY.h(range(2))
+        self.qcY.s(range(2))
         
         
     def test_ZZ(self): 
