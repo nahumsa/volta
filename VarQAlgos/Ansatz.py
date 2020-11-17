@@ -1,3 +1,6 @@
+import sys
+sys.path.append('../')
+
 from qiskit.circuit.library import TwoLocal
 
 def _get_ansatz(n_qubits):

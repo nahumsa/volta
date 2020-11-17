@@ -4,6 +4,9 @@
 import numpy as np
 from typing import Union
 
+import sys
+sys.path.append('../')
+
 ####################
 ## Qiskit imports ##
 ####################
@@ -18,10 +21,8 @@ from qiskit.providers import BaseBackend
 ###################
 ## Local imports ##
 ###################
-from utils import classical_solver
-from Observables import *
-from Observables import sample_hamiltonian
-from SWAPTest import measure_swap_test
+from VarQAlgos.Observables import sample_hamiltonian
+from VarQAlgos.SWAPTest import measure_swap_test
 
 ################
 ## begin code ##
@@ -52,7 +53,7 @@ class VQD(object):
             beta (float): Strenght parameter for the swap test.
             optimizer (qiskit.aqua.components.optimizers.Optimizer): Classical Optimizers 
             from aqua components.
-            backend (qiskit.providers.BaseBackend): Backend for running the algorithm.
+            backend (Union[BaseBackend, QuantumInstance]): Backend for running the algorithm.
             num_shots (int): Number of shots. (Default: 10000)
         """
         

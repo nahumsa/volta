@@ -1,7 +1,7 @@
 import numpy as np
-import qiskit
+from qiskit.aqua.operators import OperatorBase
 
-def classical_solver(hamiltonian: qiskit.aqua.operators.OperatorBase) -> np.array:
+def classical_solver(hamiltonian: OperatorBase) -> np.array:
     """ Solves Classically the hamiltonian.
 
     Args:

@@ -1,13 +1,16 @@
+import sys
+sys.path.append('../')
+
 import unittest
-from qiskit import QuantumCircuit, Aer
-from SWAPTest import measure_swap_test
+from qiskit import QuantumCircuit, BasicAer
+from VarQAlgos.SWAPTest import measure_swap_test
 
 class TestSWAPTest(unittest.TestCase): 
     def setUp(self):
         self.qc1 = QuantumCircuit(1)
         self.qc1.x(0)
         self.qc2 = QuantumCircuit(1)
-        self.backend = Aer.get_backend("qasm_simulator")
+        self.backend = BasicAer.get_backend("qasm_simulator")
     
     def test_10states(self): 
         want = 0.

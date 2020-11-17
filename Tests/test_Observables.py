@@ -1,10 +1,16 @@
+import sys
+sys.path.append('../')
+
 import unittest
 import qiskit
 from qiskit import BasicAer
-from Observables import *
-from Observables import sample_hamiltonian
+
+from VarQAlgos.Observables import sample_hamiltonian
 from qiskit.aqua.operators import I, X, Y, Z
 import numpy as np
+
+# Uncomment if you want to use observables made by hand
+# from VarQAlgos.Hand_Observables import *
 
 class TestObservables(unittest.TestCase): 
     def setUp(self):
@@ -26,6 +32,7 @@ class TestObservables(unittest.TestCase):
         
     def test_ZZ(self): 
         want = 1.
+        # observables made by hand
         # got = measure_zz(self.qcZ, self.backend)
         hamiltonian = (Z^Z)
         got = sample_hamiltonian(hamiltonian, self.backend, self.qcZ)
@@ -35,6 +42,7 @@ class TestObservables(unittest.TestCase):
     
     def test_XX(self): 
         want = 1.
+        # observables made by hand
         # got = measure_xx(self.qcX, self.backend)
         hamiltonian = (X^X)
         got = sample_hamiltonian(hamiltonian, self.backend, self.qcX)
@@ -44,6 +52,7 @@ class TestObservables(unittest.TestCase):
     
     def test_YY(self): 
         want = 1.
+        # observables made by hand
         # got = measure_yy(self.qcY, self.backend)
         hamiltonian = (Y^Y)
         got = sample_hamiltonian(hamiltonian, self.backend, self.qcY)
