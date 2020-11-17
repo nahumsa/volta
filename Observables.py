@@ -10,7 +10,11 @@ def sample_hamiltonian(hamiltonian: qiskit.aqua.operators.OperatorBase,
                        backend: Union[qiskit.providers.BaseBackend, qiskit.aqua.QuantumInstance],
                        ansatz: qiskit.QuantumCircuit):
     
-    sampler = CircuitSampler(backend)
+    if qiskit.aqua.quantum_instance.QuantumInstance == type(backend):
+        sampler = CircuitSampler(backend, param_qobj=is_aer_provider(backend.backend))
+    else:
+        sampler = CircuitSampler(backend)
+        
     expectation = ExpectationFactory.build(operator=hamiltonian,backend=backend)
     observable_meas = expectation.convert(StateFn(hamiltonian, is_measurement=True))
     

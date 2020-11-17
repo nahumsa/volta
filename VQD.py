@@ -2,6 +2,7 @@
 ## Helper imports ##
 ####################
 import numpy as np
+from typing import Union
 
 ####################
 ## Qiskit imports ##
@@ -10,22 +11,21 @@ import qiskit
 from qiskit.aqua.operators import OperatorBase, ListOp, PrimitiveOp, PauliOp
 from qiskit.aqua.operators import I, X, Y, Z
 from qiskit.circuit.library import TwoLocal
+from qiskit.aqua.components.optimizers import Optimizer
+from qiskit.aqua import QuantumInstance
+from qiskit.providers import BaseBackend
 
 ###################
 ## Local imports ##
 ###################
 from utils import classical_solver
 from Observables import *
+from Observables import sample_hamiltonian
 from SWAPTest import measure_swap_test
 
 ################
 ## begin code ##
 ################
-
-# hamiltonian = 1/2*((I^Z) + (Z^I) + 2*( (X^X) + (Y^Y)))
-# hamiltonian = 1/2*((Z^I) + (Z^Z))
-# eigenvalues = classical_solver(hamiltonian)
-# print(f"Eigenvalues: {eigenvalues}")
 
 class VQD(object):
     """Variational Quantum Deflation algorithm class.
@@ -33,14 +33,19 @@ class VQD(object):
     Based on https://arxiv.org/abs/1805.08138 .
 
     """
-    def __init__(self, n_qubits: int, n_excited_states: int, 
+    def __init__(self, 
+                 hamiltonian: Union[OperatorBase, ListOp, PrimitiveOp, PauliOp],
+                 n_excited_states: int, 
                  beta: float,
-                 optimizer: qiskit.aqua.components.optimizers.Optimizer, 
-                 backend: qiskit.providers.BaseBackend,
-                 num_shots: int=10000):
+                 optimizer: Optimizer, 
+                 backend: Union[BaseBackend, QuantumInstance],
+                 num_shots: int=10000,
+                 n_qubits: int=None):
         """Initialize the class.
 
         Args:
+            hamiltonian (Union[OperatorBase, ListOp, PrimitiveOp, PauliOp]): Hamiltonian 
+            constructed using qiskit's aqua operators.
             n_qubits (int): Number of qubits to use with the hardware efficient ansatz.
             n_excited_states (int): Number of excited states that you want to find the energy
             if you use 0, then it is the same as using a VQE.
@@ -52,7 +57,9 @@ class VQD(object):
         """
         
         # Input parameters
-        self.n_qubits = n_qubits        
+        self.hamiltonian = hamiltonian        
+        self.n_qubits = hamiltonian.num_qubits
+        #self.n_qubits = n_qubits 
         self.optimizer = optimizer
         self.backend = backend
         self.NUM_SHOTS = num_shots
@@ -60,7 +67,7 @@ class VQD(object):
         
         # Helper Parameters
         self.n_excited_states = n_excited_states + 1
-        self.ansatz = self._get_ansatz(n_qubits)
+        self.ansatz = self._get_ansatz(self.n_qubits)
         self.n_parameters = self._get_num_parameters(self.n_qubits)
         
         # Logs
@@ -86,7 +93,7 @@ class VQD(object):
         return self._states
 
     def _get_ansatz(self, n_qubits):
-        return TwoLocal(n_qubits, ['ry','rz'], 'cx', reps=1)
+        return TwoLocal(n_qubits, ['ry','rz'], 'cx', reps=3)
 
     def _get_num_parameters(self, n_qubits):
         return len(self.ansatz.parameters)
@@ -136,8 +143,10 @@ class VQD(object):
         qc = self._get_varform_params(params)
 
         # Hamiltonian
-        hamiltonian = self.get_hamiltonian(qc, self.backend, self.NUM_SHOTS)
-        
+        # hamiltonian = self.get_hamiltonian(qc, self.backend, self.NUM_SHOTS)
+        hamiltonian = sample_hamiltonian(hamiltonian=self.hamiltonian, 
+                                         ansatz=qc, 
+                                         backend=self.backend)
 
         # Fidelity
         fidelity = 0.

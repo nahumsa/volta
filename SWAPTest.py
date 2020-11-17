@@ -1,7 +1,10 @@
 import qiskit
 from qiskit import QuantumCircuit, execute
+from typing import Union
+from qiskit.aqua import QuantumInstance
+from qiskit.providers import BaseBackend
 
-def swap_test_circuit(qc1: qiskit.QuantumCircuit, qc2: qiskit.QuantumCircuit) -> qiskit.QuantumCircuit:
+def swap_test_circuit(qc1: QuantumCircuit, qc2: QuantumCircuit) -> QuantumCircuit:
     """ Construct the SWAP test circuit given two circuits.
 
     Args:
@@ -32,14 +35,18 @@ def swap_test_circuit(qc1: qiskit.QuantumCircuit, qc2: qiskit.QuantumCircuit) ->
     qc_swap.measure(0,0)
     return qc_swap
 
-def measure_swap_test(qc1: qiskit.QuantumCircuit, qc2: qiskit.QuantumCircuit,
-                     backend: qiskit.providers.aer.backends,
+def measure_swap_test(qc1: QuantumCircuit, qc2: QuantumCircuit,
+                     backend: Union[BaseBackend,QuantumInstance],
                      num_shots: int=10000) -> float:
     """ Returns the fidelity from a SWAP test.
     """
     swap_circuit = swap_test_circuit(qc1, qc2)
 
-    count = execute(swap_circuit, backend=backend, shots=num_shots).result().get_counts()
+    # Check if the backend is a quantum instance.
+    if qiskit.aqua.quantum_instance.QuantumInstance == type(backend):
+        count = backend.execute(swap_circuit).get_counts()
+    else:
+        count = execute(swap_circuit, backend=backend, shots=num_shots).result().get_counts()
     
     if '0' not in count:
         count['0'] = 0

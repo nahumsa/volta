@@ -14,7 +14,7 @@ class TestVQD(unittest.TestCase):
 
         optimizer = qiskit.aqua.components.optimizers.COBYLA()
         backend = qiskit.BasicAer.get_backend('qasm_simulator')
-        hamiltonian = 1/2*((Z^I) + (Z^Z))
+        hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
         
         self.Algo = VQD(hamiltonian=hamiltonian,
                         n_excited_states=1,
