@@ -1,3 +1,6 @@
+# In order to run all tests, just use:
+# python runalltests.py
+
 import unittest
 loader = unittest.TestLoader()
 start_dir = 'Tests'
