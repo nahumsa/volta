@@ -3,7 +3,7 @@ sys.path.append('../')
 
 import unittest
 from qiskit import QuantumCircuit, BasicAer
-from VarQAlgos.SWAPTest import measure_swap_test
+from VOLTA.SWAPTest import measure_swap_test
 
 class TestSWAPTest(unittest.TestCase): 
     def setUp(self):

@@ -10,8 +10,8 @@ from qiskit.aqua import QuantumInstance
 from qiskit.aqua.operators import Z,I
 
 # Local Imports
-from VarQAlgos.VQD import VQD
-from VarQAlgos.utils import classical_solver
+from VOLTA.VQD import VQD
+from VOLTA.utils import classical_solver
 
 
 class TestVQD(unittest.TestCase): 

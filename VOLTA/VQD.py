@@ -21,8 +21,8 @@ from qiskit.providers import BaseBackend
 ###################
 ## Local imports ##
 ###################
-from VarQAlgos.Observables import sample_hamiltonian
-from VarQAlgos.SWAPTest import measure_swap_test
+from VOLTA.Observables import sample_hamiltonian
+from VOLTA.SWAPTest import measure_swap_test
 
 ################
 ## begin code ##

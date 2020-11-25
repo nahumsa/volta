@@ -5,7 +5,7 @@ import unittest
 import qiskit
 from qiskit import BasicAer
 
-from VarQAlgos.Observables import sample_hamiltonian
+from VOLTA.Observables import sample_hamiltonian
 from qiskit.aqua.operators import I, X, Y, Z
 import numpy as np
 
