@@ -40,8 +40,7 @@ class VQD(object):
                  beta: float,
                  optimizer: Optimizer, 
                  backend: Union[BaseBackend, QuantumInstance],
-                 num_shots: int=10000,
-                 n_qubits: int=None):
+                 num_shots: int=10000):
         """Initialize the class.
 
         Args:
@@ -60,7 +59,6 @@ class VQD(object):
         # Input parameters
         self.hamiltonian = hamiltonian        
         self.n_qubits = hamiltonian.num_qubits
-        #self.n_qubits = n_qubits 
         self.optimizer = optimizer
         self.backend = backend
         self.NUM_SHOTS = num_shots

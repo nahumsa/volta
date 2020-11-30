@@ -1,2 +1,0 @@
-AUTO	vAriational qUanTum algOrithms
-VOLTA	VariatiOnaL quanTum Algorithms

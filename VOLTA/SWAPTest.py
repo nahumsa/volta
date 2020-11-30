@@ -38,7 +38,16 @@ def swap_test_circuit(qc1: QuantumCircuit, qc2: QuantumCircuit) -> QuantumCircui
 def measure_swap_test(qc1: QuantumCircuit, qc2: QuantumCircuit,
                      backend: Union[BaseBackend,QuantumInstance],
                      num_shots: int=10000) -> float:
-    """ Returns the fidelity from a SWAP test.
+    """Returns the fidelity from a SWAP test.
+
+    Args:
+        qc1 (QuantumCircuit): Quantum Circuit for the first state.
+        qc2 (QuantumCircuit): Quantum Circuit for the second state.
+        backend (Union[BaseBackend,QuantumInstance]): Backend.
+        num_shots (int, optional): Number of shots. Defaults to 10000.
+
+    Returns:
+        float: result of the overlap betweeen the first and second state.
     """
     swap_circuit = swap_test_circuit(qc1, qc2)
 
