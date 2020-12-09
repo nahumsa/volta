@@ -11,6 +11,7 @@ sys.path.append('../')
 ## Qiskit imports ##
 ####################
 import qiskit
+from qiskit import QuantumCircuit
 from qiskit.aqua.operators import OperatorBase, ListOp, PrimitiveOp, PauliOp
 from qiskit.aqua.operators import I, X, Y, Z
 from qiskit.circuit.library import TwoLocal
@@ -31,11 +32,12 @@ from VOLTA.SWAPTest import measure_swap_test
 class VQD(object):
     """Variational Quantum Deflation algorithm class.
 
-    Based on https://arxiv.org/abs/1805.08138 .
+    Based on https://arxiv.org/abs/1805.08138 
 
     """
     def __init__(self, 
                  hamiltonian: Union[OperatorBase, ListOp, PrimitiveOp, PauliOp],
+                 ansatz: QuantumCircuit,
                  n_excited_states: int, 
                  beta: float,
                  optimizer: Optimizer, 
@@ -46,7 +48,7 @@ class VQD(object):
         Args:
             hamiltonian (Union[OperatorBase, ListOp, PrimitiveOp, PauliOp]): Hamiltonian 
             constructed using qiskit's aqua operators.
-            n_qubits (int): Number of qubits to use with the hardware efficient ansatz.
+            ansatz (QuantumCircuit): Anstaz that you want to run VQD.
             n_excited_states (int): Number of excited states that you want to find the energy
             if you use 0, then it is the same as using a VQE.
             beta (float): Strenght parameter for the swap test.
@@ -66,8 +68,8 @@ class VQD(object):
         
         # Helper Parameters
         self.n_excited_states = n_excited_states + 1
-        self.ansatz = self._get_ansatz(self.n_qubits)
-        self.n_parameters = self._get_num_parameters(self.n_qubits)
+        self.ansatz = ansatz
+        self.n_parameters = self._get_num_parameters
         
         # Logs
         self._states = []
@@ -90,14 +92,16 @@ class VQD(object):
             list: list with states.
         """
         return self._states
+    @property
+    def _get_num_parameters(self) -> int:
+        """Get the number of parameters in a given ansatz.
 
-    def _get_ansatz(self, n_qubits):
-        return TwoLocal(n_qubits, ['ry','rz'], 'cx', reps=3)
-
-    def _get_num_parameters(self, n_qubits):
+        Returns:
+            int: Number of parameters of the given ansatz.
+        """
         return len(self.ansatz.parameters)
 
-    def _get_varform_params(self, params):
+    def _apply_varform_params(self, params: list):
         """Get an hardware-efficient ansatz for n_qubits
         given parameters.
         """
@@ -119,30 +123,20 @@ class VQD(object):
 
         return wave_function
     
-    def get_hamiltonian(self, qc: qiskit.QuantumCircuit, 
-                        backend: qiskit.providers.BaseBackend, 
-                        num_shots: int):
-        """Get the hamiltonian that we want to minimize.
+    
+    def cost_function(self, params:list) -> float:
+        """Evaluate the cost function of VQD.
 
         Args:
-            qc (qiskit.QuantumCircuit): Ansatz with pararamers attached.
-            backend (qiskit.providers.BaseBackend): Backend to run.
-            num_shots (int): Number of shots.
-        """
-        # Hamiltonian BCS
-        # hamiltonian = .5*(measure_iz(qc, backend, num_shots) + measure_zi(qc, backend, num_shots)
-        #                + 2*(measure_xx(qc, backend, num_shots) + measure_yy(qc, backend, num_shots)))
+            params (list): Parameter values for the ansatz.
 
-        hamiltonian = 0.5*(measure_zi(qc, backend, num_shots) + measure_zz(qc, backend, num_shots))
-        return hamiltonian
-    
-    def energy_evaluation(self, params):
-        
+        Returns:
+            float: Cost function value.
+        """
         # Define Ansatz
-        qc = self._get_varform_params(params)
+        qc = self._apply_varform_params(params)
 
         # Hamiltonian
-        # hamiltonian = self.get_hamiltonian(qc, self.backend, self.NUM_SHOTS)
         hamiltonian = sample_hamiltonian(hamiltonian=self.hamiltonian, 
                                          ansatz=qc, 
                                          backend=self.backend)
@@ -151,7 +145,9 @@ class VQD(object):
         fidelity = 0.
         if len(self.states) != 0:
             for state in self.states:
-                fidelity += measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
+                swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
+                print(swap)
+                fidelity += swap
 
         # Get the cost function
         cost = hamiltonian + self.BETA*fidelity
@@ -159,18 +155,19 @@ class VQD(object):
         return cost
 
     def optimizer_run(self):
-
+        
+        # Random initialization
         params = np.random.rand(self.n_parameters)
 
         optimal_params, energy, n_iters = self.optimizer.optimize(num_vars=self.n_parameters, 
-                                                                    objective_function=self.energy_evaluation, 
-                                                                    initial_point=params)
+                                                                  objective_function=self.cost_function, 
+                                                                  initial_point=params)
         
         # Logging the energies and states
         # TODO: Change to an ordered list.
         
         self._energies.append(energy)
-        self._states.append(self._get_varform_params(optimal_params))
+        self._states.append(self._apply_varform_params(optimal_params))
     
     def _reset(self):
         """Resets the energies and states helper variables.

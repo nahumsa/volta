@@ -5,6 +5,7 @@ import unittest
 
 # Qiskit imports
 import qiskit
+from qiskit.circuit.library import TwoLocal
 from qiskit import QuantumCircuit, BasicAer
 from qiskit.aqua import QuantumInstance
 from qiskit.aqua.operators import Z,I
@@ -23,9 +24,12 @@ class TestVQD(unittest.TestCase):
         
         backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
                           shots=10000)
+           
         hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
-        
+        ansatz = TwoLocal(hamiltonian.num_qubits, ['ry','rz'], 'cx', reps=1)
+
         self.Algo = VQD(hamiltonian=hamiltonian,
+                        ansatz = ansatz,
                         n_excited_states=1,
                         beta=1.,
                         optimizer=optimizer,
