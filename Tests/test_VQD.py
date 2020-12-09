@@ -19,7 +19,10 @@ class TestVQD(unittest.TestCase):
     def setUp(self):
 
         optimizer = qiskit.aqua.components.optimizers.COBYLA()
-        backend = qiskit.BasicAer.get_backend('qasm_simulator')
+        # backend = qiskit.BasicAer.get_backend('qasm_simulator')
+        
+        backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
+                          shots=10000)
         hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
         
         self.Algo = VQD(hamiltonian=hamiltonian,
@@ -29,7 +32,7 @@ class TestVQD(unittest.TestCase):
                         backend=backend)
 
         self.Algo.run(verbose=0)        
-        self.eigenvalues = classical_solver(hamiltonian)
+        self.eigenvalues, _ = classical_solver(hamiltonian)
         
     
     def test_energies(self): 
@@ -38,7 +41,7 @@ class TestVQD(unittest.TestCase):
         decimalPlace = 1
         message = "VQD not working for the ground state of 1/2*((Z^I) + (Z^Z))"
         self.assertAlmostEqual(want, got, decimalPlace, message)
-        decimalPlace = 0
+        decimalPlace = 1
         want = self.eigenvalues[1]
         got = self.Algo.energies[1]
         message = "VQD not working for the first excited state of 1/2*((Z^I) + (Z^Z))"

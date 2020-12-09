@@ -13,9 +13,9 @@ def classical_solver(hamiltonian: OperatorBase) -> np.array:
     """
     
     try:
-        eigenvalues, _ = np.linalg.eigh(hamiltonian.to_matrix())
+        eigenvalues, eigenvectors = np.linalg.eigh(hamiltonian.to_matrix())
     
     except:
         raise Exception("Not able to get the eigenvalues.")
 
-    return eigenvalues   
+    return eigenvalues, eigenvectors

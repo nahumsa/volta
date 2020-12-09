@@ -7,6 +7,7 @@ from qiskit import BasicAer
 
 from VOLTA.Observables import sample_hamiltonian
 from qiskit.aqua.operators import I, X, Y, Z
+from qiskit.aqua import QuantumInstance
 import numpy as np
 
 # Uncomment if you want to use observables made by hand
@@ -15,8 +16,9 @@ import numpy as np
 class TestObservables(unittest.TestCase): 
     def setUp(self):
         # Simulator
-        self.backend = BasicAer.get_backend("qasm_simulator")
-        
+        self.backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
+                          shots=10000)
+
         # ZZ expectation value of 1
         self.qcZ = qiskit.QuantumCircuit(2)        
         

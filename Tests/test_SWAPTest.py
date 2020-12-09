@@ -3,6 +3,7 @@ sys.path.append('../')
 
 import unittest
 from qiskit import QuantumCircuit, BasicAer
+from qiskit.aqua import QuantumInstance
 from VOLTA.SWAPTest import measure_swap_test
 
 class TestSWAPTest(unittest.TestCase): 
@@ -10,7 +11,9 @@ class TestSWAPTest(unittest.TestCase):
         self.qc1 = QuantumCircuit(1)
         self.qc1.x(0)
         self.qc2 = QuantumCircuit(1)
-        self.backend = BasicAer.get_backend("qasm_simulator")
+        # self.backend = BasicAer.get_backend("qasm_simulator")
+        self.backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
+                                       shots=10000)
     
     def test_10states(self): 
         want = 0.
