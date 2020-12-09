@@ -42,7 +42,8 @@ class VQD(object):
                  beta: float,
                  optimizer: Optimizer, 
                  backend: Union[BaseBackend, QuantumInstance],
-                 num_shots: int=10000):
+                 num_shots: int=10000,
+                 debug: bool=False):
         """Initialize the class.
 
         Args:
@@ -70,7 +71,8 @@ class VQD(object):
         self.n_excited_states = n_excited_states + 1
         self.ansatz = ansatz
         self.n_parameters = self._get_num_parameters
-        
+        self._debug = debug
+
         # Logs
         self._states = []
         self._energies = []
@@ -137,20 +139,22 @@ class VQD(object):
         qc = self._apply_varform_params(params)
 
         # Hamiltonian
-        hamiltonian = sample_hamiltonian(hamiltonian=self.hamiltonian, 
-                                         ansatz=qc, 
-                                         backend=self.backend)
+        hamiltonian_eval = sample_hamiltonian(hamiltonian=self.hamiltonian, 
+                                             ansatz=qc, 
+                                             backend=self.backend)
 
         # Fidelity
         fidelity = 0.
         if len(self.states) != 0:
             for state in self.states:
                 swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
-                print(swap)
                 fidelity += swap
+                
+                if self._debug:
+                    print(fidelity)
 
         # Get the cost function
-        cost = hamiltonian + self.BETA*fidelity
+        cost = hamiltonian_eval + self.BETA*fidelity
         
         return cost
 
