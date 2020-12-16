@@ -20,7 +20,6 @@ class TestVQD(unittest.TestCase):
     def setUp(self):
 
         optimizer = qiskit.aqua.components.optimizers.COBYLA()
-        # backend = qiskit.BasicAer.get_backend('qasm_simulator')
         
         backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
                           shots=10000)
