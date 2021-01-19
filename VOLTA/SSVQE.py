@@ -42,6 +42,7 @@ class SSVQE(object):
                  hamiltonian: Union[OperatorBase, ListOp, PrimitiveOp, PauliOp],
                  ansatz: QuantumCircuit,
                  backend: Union[BaseBackend, QuantumInstance],
+                 optimizer: Optimizer, 
                  debug: bool=False):
         """Initialize the class.
 
@@ -128,21 +129,25 @@ class SSVQE(object):
                 self.ansatz.name = name
             states.append(self.ansatz, range(self.n_qubits))
         
-    # TODO
     def _construct_states(self):
         circuit = self._create_blank_circuit()
+
         self._apply_initialization(circuit)
 
         if self._first_optimization:
-            self._apply_ansatz(circuit), 'U(ϕ)'
+            self._apply_ansatz(circuit, 'V(ϕ)')
         
-        if type(self._ansatz_1_params) != list:
+        
+        if type(self._ansatz_1_params) != type(np.array([])):
             self._apply_ansatz(circuit)    
         
         else:
-            self._apply_ansatz(circuit, 'V(θ)')
-            for ind in range(len(circuit)):
-                circuit[ind] = self._apply_varform_params(circuit[ind], self._ansatz_1_params)
+            aux_circuit =  [QuantumCircuit(self.n_qubits)]
+            self._apply_ansatz(aux_circuit, 'U(θ)')
+            aux_circuit = self._apply_varform_params(aux_circuit[0], self._ansatz_1_params)
+            aux_circuit.name = 'U(θ)'
+            for states in circuit:
+                states.append(aux_circuit, range(self.n_qubits))    
 
         return circuit
 
@@ -206,26 +211,38 @@ class SSVQE(object):
 
         params = np.random.rand(self.n_parameters)
 
-        optimal_params, energy, n_iters = optimizer.optimize(num_vars=self.n_parameters, 
+        optimal_params, energy, n_iters = self.optimizer.optimize(num_vars=self.n_parameters, 
                                                              objective_function=cost, 
                                                              initial_point=params)
         
         state = self._construct_states()[index]
         return energy, self._apply_varform_params(state, optimal_params)
 
-    def run(self, index):
+    def run(self, index:int) -> (float, QuantumCircuit):
+        """Run SSVQE for a given index.
+
+        Args:
+            index(int): Index of the given excited state.
+
+        Returns:
+            Energy: Energy of such excited state.
+            State: State for such energy.
+        """
         energy, state = self._excited_state_optimizer(index)
         return energy, state
 
 if __name__ == "__main__":
     from qiskit import BasicAer
-    optimizer = qiskit.aqua.components.optimizers.COBYLA()
+    optimizer = qiskit.aqua.components.optimizers.COBYLA(maxiter=100)
 
     backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
                     shots=10000)
 
     hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
     ansatz = TwoLocal(hamiltonian.num_qubits, ['ry','rz'], 'cx', reps=1)
-    algo = SSVQE(hamiltonian, ansatz, backend)
-    print(algo._construct_states()[3])
+    algo = SSVQE(hamiltonian, ansatz, backend, optimizer)
+    energy, state = algo.run(1)
+    print(energy)
+    print(state)
+
     
