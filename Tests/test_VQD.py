@@ -15,10 +15,9 @@ from VOLTA.VQD import VQD
 from VOLTA.utils import classical_solver
 
 
-class TestVQD(unittest.TestCase): 
+class TestVQDSWAP(unittest.TestCase): 
 
     def setUp(self):
-
         optimizer = qiskit.aqua.components.optimizers.COBYLA()
         
         backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
@@ -38,18 +37,62 @@ class TestVQD(unittest.TestCase):
         self.eigenvalues, _ = classical_solver(hamiltonian)
         
     
-    def test_energies(self): 
+    def test_energies_0(self): 
+        decimal_place = 1
         want = self.eigenvalues[0]
         got = self.Algo.energies[0]
-        decimalPlace = 1
-        message = "VQD not working for the ground state of 1/2*((Z^I) + (Z^Z))"
-        self.assertAlmostEqual(want, got, decimalPlace, message)
-        decimalPlace = 1
+
+        message = "VQD with SWAP not working for the ground state of 1/2*((Z^I) + (Z^Z))"
+        self.assertAlmostEqual(want, got, decimal_place, message)
+
+    def test_energies_1(self):
+        decimal_place = 1
         want = self.eigenvalues[1]
         got = self.Algo.energies[1]
-        message = "VQD not working for the first excited state of 1/2*((Z^I) + (Z^Z))"
-        self.assertAlmostEqual(want, got, decimalPlace, message)
+
+        message = "VQD with SWAP not working for the first excited state of 1/2*((Z^I) + (Z^Z))"
+        self.assertAlmostEqual(want, got, decimal_place, message)
     
+class TestVQDDSWAP(unittest.TestCase): 
+
+    def setUp(self):
+        optimizer = qiskit.aqua.components.optimizers.COBYLA()
+        
+        backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
+                          shots=10000)
+           
+        hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
+        ansatz = TwoLocal(hamiltonian.num_qubits, ['ry','rz'], 'cx', reps=1)
+
+        self.Algo = VQD(hamiltonian=hamiltonian,
+                        ansatz = ansatz,
+                        n_excited_states=1,
+                        beta=1.,
+                        optimizer=optimizer,
+                        backend=backend,
+                        dswap=True)
+
+        self.Algo.run(verbose=0)        
+        self.eigenvalues, _ = classical_solver(hamiltonian)
+        
+    
+    def test_energies_0(self): 
+        decimal_place = 1
+        want = self.eigenvalues[0]
+        got = self.Algo.energies[0]
+
+        message = "VQD with DSWAP not working for the ground state of 1/2*((Z^I) + (Z^Z))"
+        self.assertAlmostEqual(want, got, decimal_place, message)
+                
+    def test_energies_1(self):
+        decimal_place = 1
+        want = self.eigenvalues[1]
+        got = self.Algo.energies[1]
+        
+        message = "VQD with DSWAP not working for the first excited state of 1/2*((Z^I) + (Z^Z))"
+        self.assertAlmostEqual(want, got, decimal_place, message)
+
+
 
 if __name__== "__main__":
     unittest.main(argv=[''], verbosity=2, exit=False);

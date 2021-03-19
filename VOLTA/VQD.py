@@ -23,7 +23,7 @@ from qiskit.providers import BaseBackend
 ## Local imports ##
 ###################
 from VOLTA.Observables import sample_hamiltonian
-from VOLTA.SWAPTest import measure_swap_test
+from VOLTA.SWAPTest import measure_swap_test, measure_dswap_test
 
 ################
 ## begin code ##
@@ -42,6 +42,7 @@ class VQD(object):
                  beta: float,
                  optimizer: Optimizer, 
                  backend: Union[BaseBackend, QuantumInstance],
+                 dswap: bool=False,
                  num_shots: int=10000,
                  debug: bool=False):
         """Initialize the class.
@@ -66,6 +67,7 @@ class VQD(object):
         self.backend = backend
         self.NUM_SHOTS = num_shots
         self.BETA = beta
+        self.dswap = dswap
         
         # Helper Parameters
         self.n_excited_states = n_excited_states + 1
@@ -94,6 +96,7 @@ class VQD(object):
             list: list with states.
         """
         return self._states
+
     @property
     def _get_num_parameters(self) -> int:
         """Get the number of parameters in a given ansatz.
@@ -147,7 +150,10 @@ class VQD(object):
         fidelity = 0.
         if len(self.states) != 0:
             for state in self.states:
-                swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
+                if self.dswap:
+                    swap = measure_dswap_test(qc, state, self.backend, self.NUM_SHOTS)
+                else:
+                    swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
                 fidelity += swap
                 
                 if self._debug:
