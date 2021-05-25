@@ -24,8 +24,7 @@ from qiskit.providers import BaseBackend
 ###################
 ## Local imports ##
 ###################
-from VOLTA.Observables import sample_hamiltonian
-from VOLTA.SWAPTest import measure_swap_test
+from volta.observables import sample_hamiltonian
 
 ################
 ## begin code ##

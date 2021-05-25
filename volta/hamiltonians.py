@@ -1,8 +1,10 @@
 import numpy as np
-from qiskit.aqua.operators import I, X, Y, Z
+
 from typing import Union
-from qiskit.aqua.operators.list_ops.summed_op import SummedOp
-from qiskit.aqua.operators.primitive_ops.pauli_op import PauliOp
+
+from qiskit.opflow import I, X, Y, Z
+from qiskit.opflow.list_ops.summed_op import SummedOp
+from qiskit.opflow.primitive_ops.pauli_op import PauliOp
 
 def listop2op(listop: list, 
               coef: float=1) -> PauliOp:

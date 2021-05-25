@@ -2,12 +2,11 @@ import sys
 sys.path.append('../')
 
 from typing import Union
-import qiskit
+
 import numpy as np
+
+import qiskit
 from qiskit import Aer, execute
-from qiskit.aqua.utils.backend_utils import is_aer_provider
-from qiskit.aqua.operators import (PauliExpectation, CircuitSampler, ExpectationFactory,
-                                   CircuitStateFn, StateFn, ListOp)
 
 # Observables made by hand, those observables are changed 
 # for the more general function sample_hamiltonian
@@ -67,7 +66,7 @@ def measure_iz(qc, backend, shots=10000):
     iz_circuit = _measure_zz_circuit(qc)
     
     count = execute(iz_circuit, backend=backend, shots=shots).result().get_counts()
-    count = _clear_counts(count)
+    count = _clear_counts(count)CircuitSampler
 
     # Get total counts in order to obtain the probability
     total_counts = count['00'] + count['11'] + count['01'] + count['10']

@@ -7,18 +7,18 @@ import unittest
 import qiskit
 from qiskit.circuit.library import TwoLocal
 from qiskit import QuantumCircuit, BasicAer
-from qiskit.aqua import QuantumInstance
-from qiskit.aqua.operators import Z,I
+from qiskit.utils import QuantumInstance
+from qiskit.opflow import Z,I
 
 # Local Imports
-from VOLTA.SSVQE import SSVQE
-from VOLTA.utils import classical_solver
+from volta.ssvqe import SSVQE
+from volta.utils import classical_solver
 
 # class TestSSVQD(unittest.TestCase): 
 
 #     def setUp(self):
 
-#         optimizer = qiskit.aqua.components.optimizers.COBYLA()
+#         optimizer = qiskit.algorithms.optimizers.COBYLA()
         
 #         backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
 #                           shots=10000)

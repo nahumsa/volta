@@ -1,5 +1,5 @@
 import numpy as np
-from qiskit.aqua.operators import OperatorBase
+from qiskit.opflow import OperatorBase
 
 def classical_solver(hamiltonian: OperatorBase) -> np.array:
     """ Solves Classically the hamiltonian.
