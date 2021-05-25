@@ -12,18 +12,18 @@ sys.path.append('../')
 ####################
 import qiskit
 from qiskit import QuantumCircuit
-from qiskit.aqua.operators import OperatorBase, ListOp, PrimitiveOp, PauliOp
-from qiskit.aqua.operators import I, X, Y, Z
+from qiskit.opflow import OperatorBase, ListOp, PrimitiveOp, PauliOp
+from qiskit.opflow import I, X, Y, Z
 from qiskit.circuit.library import TwoLocal
-from qiskit.aqua.components.optimizers import Optimizer
+from qiskit.algorithms.optimizers import Optimizer
 from qiskit.aqua import QuantumInstance
 from qiskit.providers import BaseBackend
 
 ###################
 ## Local imports ##
 ###################
-from VOLTA.Observables import sample_hamiltonian
-from VOLTA.SWAPTest import measure_swap_test, measure_dswap_test
+from volta.observables import sample_hamiltonian
+from volta.swaptest import measure_swap_test, measure_dswap_test
 
 ################
 ## begin code ##

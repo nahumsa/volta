@@ -3,8 +3,8 @@ sys.path.append('../')
 
 import unittest
 from qiskit import QuantumCircuit, BasicAer
-from qiskit.aqua import QuantumInstance
-from VOLTA.SWAPTest import measure_swap_test, measure_dswap_test
+from qiskit.utils import QuantumInstance
+from volta.swaptest import measure_swap_test, measure_dswap_test
 
 class TestSWAPTest(unittest.TestCase): 
     def setUp(self):

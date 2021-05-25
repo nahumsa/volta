@@ -5,9 +5,9 @@ import unittest
 import qiskit
 from qiskit import BasicAer
 
-from VOLTA.Observables import sample_hamiltonian
-from qiskit.aqua.operators import I, X, Y, Z
-from qiskit.aqua import QuantumInstance
+from volta.observables import sample_hamiltonian
+from qiskit.opflow import I, X, Y, Z
+from qiskit.utils import QuantumInstance
 import numpy as np
 
 # Uncomment if you want to use observables made by hand

@@ -1,6 +1,6 @@
 import qiskit
 from qiskit import QuantumCircuit, execute
-from qiskit.aqua import QuantumInstance
+from qiskit.utils import QuantumInstance
 from qiskit.providers import BaseBackend
 
 from typing import Union
@@ -54,7 +54,7 @@ def measure_swap_test(qc1: QuantumCircuit, qc2: QuantumCircuit,
     swap_circuit = swap_test_circuit(qc1, qc2)
 
     # Check if the backend is a quantum instance.
-    if qiskit.aqua.quantum_instance.QuantumInstance == type(backend):
+    if qiskit.utils.quantum_instance.QuantumInstance == type(backend):
         count = backend.execute(swap_circuit).get_counts()
     else:
         count = execute(swap_circuit, backend=backend, shots=num_shots).result().get_counts()
@@ -122,7 +122,7 @@ def measure_dswap_test(qc1: QuantumCircuit, qc2: QuantumCircuit,
     swap_circuit = dswap_test_circuit(qc1, qc2)
 
     # Check if the backend is a quantum instance.
-    if qiskit.aqua.quantum_instance.QuantumInstance == type(backend):
+    if qiskit.utils.quantum_instance.QuantumInstance == type(backend):
         count = backend.execute(swap_circuit).get_counts()
     else:
         count = execute(swap_circuit, backend=backend, shots=num_shots).result().get_counts()
