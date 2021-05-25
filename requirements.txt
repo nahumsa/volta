@@ -34,7 +34,7 @@ nox==2020.12.31
 ntlm-auth==1.5.0
 numpy
 packaging==20.9
-pandas==1.2.3
+pandas
 pathspec==0.8.1
 pluggy==0.13.1
 ply==3.11
