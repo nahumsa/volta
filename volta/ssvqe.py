@@ -1,70 +1,61 @@
-####################
-## Helper imports ##
-####################
 import numpy as np
 from typing import Union
 import textwrap
 from functools import partial
 
 import sys
-sys.path.append('./')
 
-####################
-## Qiskit imports ##
-####################
-import qiskit
+sys.path.append("./")
+
 from qiskit import QuantumCircuit
-from qiskit.aqua.operators import OperatorBase, ListOp, PrimitiveOp, PauliOp
-from qiskit.aqua.operators import I, X, Y, Z
+from qiskit.opflow import OperatorBase, ListOp, PrimitiveOp, PauliOp
+from qiskit.opflow import I, X, Y, Z
 from qiskit.circuit.library import TwoLocal
-from qiskit.aqua.components.optimizers import Optimizer
-from qiskit.aqua import QuantumInstance
+from qiskit.algorithms.optimizers import Optimizer
+from qiskit.utils import QuantumInstance
 from qiskit.providers import BaseBackend
 
-###################
-## Local imports ##
-###################
 from volta.observables import sample_hamiltonian
 
-################
-## begin code ##
-################
 
 class SSVQE(object):
-    """Subspace-search variational quantum eigensolver for excited states 
+    """Subspace-search variational quantum eigensolver for excited states
     algorithm class.
 
     Based on https://arxiv.org/abs/1810.09434
 
     """
-    def __init__(self, 
-                 hamiltonian: Union[OperatorBase, ListOp, PrimitiveOp, PauliOp],
-                 ansatz: QuantumCircuit,
-                 backend: Union[BaseBackend, QuantumInstance],
-                 optimizer: Optimizer, 
-                 debug: bool=False):
+
+    def __init__(
+        self,
+        hamiltonian: Union[OperatorBase, ListOp, PrimitiveOp, PauliOp],
+        ansatz: QuantumCircuit,
+        backend: Union[BaseBackend, QuantumInstance],
+        optimizer: Optimizer,
+        debug: bool = False,
+    ):
         """Initialize the class.
 
         Args:
-            hamiltonian (Union[OperatorBase, ListOp, PrimitiveOp, PauliOp]): Hamiltonian 
+            hamiltonian (Union[OperatorBase, ListOp, PrimitiveOp, PauliOp]): Hamiltonian
             constructed using qiskit's aqua operators.
             ansatz (QuantumCircuit): Anstaz that you want to run VQD.
-            optimizer (qiskit.aqua.components.optimizers.Optimizer): Classical Optimizers 
+            optimizer (qiskit.aqua.components.optimizers.Optimizer): Classical Optimizers
             from aqua components.
             backend (Union[BaseBackend, QuantumInstance]): Backend for running the algorithm.
         """
-        
+
         # Input parameters
-        self.hamiltonian = hamiltonian        
+        self.hamiltonian = hamiltonian
         self.n_qubits = hamiltonian.num_qubits
         self.optimizer = optimizer
         self.backend = backend
-        
+
         # Helper Parameters
         self.ansatz = ansatz
         self.n_parameters = self._get_num_parameters
         self._debug = debug
-        
+
         #
         self._ansatz_1_params = None
         self._first_optimization = False
@@ -73,24 +64,26 @@ class SSVQE(object):
         self._inate_optimizer_run()
 
     def _create_blank_circuit(self) -> list:
-        return [QuantumCircuit(self.n_qubits) for _ in range(2**self.n_qubits)]
+        return [
+            QuantumCircuit(self.n_qubits) for _ in range(2 ** self.n_qubits)
+        ]
 
     def _copy_unitary(self, list_states: list) -> list:
         out_states = []
         for state in list_states:
             out_states.append(state.copy())
         return out_states
-    
+
     def _apply_initialization(self, list_states: list) -> None:
         for ind, state in enumerate(list_states):
             b = bin(ind)[2:]
             if len(b) != self.n_qubits:
-                b = '0'*(self.n_qubits - len(b)) + b
+                b = "0" * (self.n_qubits - len(b)) + b
             spl = textwrap.wrap(b, 1)
             for qubit, val in enumerate(spl):
-                if val == '1':
+                if val == "1":
                     state.x(qubit)
-    
+
     @property
     def _get_num_parameters(self) -> int:
         """Get the number of parameters in a given ansatz.
@@ -112,7 +105,9 @@ class SSVQE(object):
         var_form_params = sorted(var_form.parameters, key=lambda p: p.name)
 
         # Check if the number of parameters is compatible
-        assert len(var_form_params) == len(params), "The number of parameters don't match"
+        assert len(var_form_params) == len(
+            params
+        ), "The number of parameters don't match"
 
         # Create a dictionary with the parameters and values
         param_dict = dict(zip(var_form_params, params))
@@ -122,35 +117,36 @@ class SSVQE(object):
 
         return wave_function
 
-    def _apply_ansatz(self, list_states: list, name: str=None) -> None:
+    def _apply_ansatz(self, list_states: list, name: str = None) -> None:
         for states in list_states:
             if name:
                 self.ansatz.name = name
             states.append(self.ansatz, range(self.n_qubits))
-        
+
     def _construct_states(self):
         circuit = self._create_blank_circuit()
 
         self._apply_initialization(circuit)
 
         if self._first_optimization:
-            self._apply_ansatz(circuit, 'V(ϕ)')
-        
-        
+            self._apply_ansatz(circuit, "V(ϕ)")
+
         if type(self._ansatz_1_params) != type(np.array([])):
-            self._apply_ansatz(circuit)    
-        
+            self._apply_ansatz(circuit)
+
         else:
-            aux_circuit =  [QuantumCircuit(self.n_qubits)]
-            self._apply_ansatz(aux_circuit, 'U(θ)')
-            aux_circuit = self._apply_varform_params(aux_circuit[0], self._ansatz_1_params)
-            aux_circuit.name = 'U(θ)'
+            aux_circuit = [QuantumCircuit(self.n_qubits)]
+            self._apply_ansatz(aux_circuit, "U(θ)")
+            aux_circuit = self._apply_varform_params(
+                aux_circuit[0], self._ansatz_1_params
+            )
+            aux_circuit.name = "U(θ)"
             for states in circuit:
-                states.append(aux_circuit, range(self.n_qubits))    
+                states.append(aux_circuit, range(self.n_qubits))
 
         return circuit
 
-    def _cost_function_1(self, params:list) -> float:
+    def _cost_function_1(self, params: list) -> float:
         """Evaluate the first cost function of SSVQE.
 
         Args:
@@ -162,32 +158,34 @@ class SSVQE(object):
 
         # Construct states
         states = self._construct_states()
-        
+
         cost = 0
         for state in states:
             qc = self._apply_varform_params(state, params)
 
             # Hamiltonian
-            hamiltonian_eval = sample_hamiltonian(hamiltonian=self.hamiltonian, 
-                                                 ansatz=qc, 
-                                                 backend=self.backend)
-            
+            hamiltonian_eval = sample_hamiltonian(
+                hamiltonian=self.hamiltonian, ansatz=qc, backend=self.backend
+            )
+
             cost += hamiltonian_eval
-        
+
         return cost
 
     def _inate_optimizer_run(self):
-        
+
         # Random initialization
         params = np.random.rand(self.n_parameters)
 
-        optimal_params, energy, n_iters = self.optimizer.optimize(num_vars=self.n_parameters, 
-                                                                  objective_function=self._cost_function_1, 
-                                                                  initial_point=params)
-        
+        optimal_params, energy, n_iters = self.optimizer.optimize(
+            num_vars=self.n_parameters,
+            objective_function=self._cost_function_1,
+            initial_point=params,
+        )
+
         self._ansatz_1_params = optimal_params
         self._first_optimization = True
-    
+
     def _cost_excited_state(self, ind: int, params: list):
         cost = 0
         # Construct states
@@ -197,27 +195,28 @@ class SSVQE(object):
         qc = self._apply_varform_params(states[ind], params)
 
         # Hamiltonian
-        hamiltonian_eval = sample_hamiltonian(hamiltonian=self.hamiltonian, 
-                                             ansatz=qc, 
-                                             backend=self.backend)
+        hamiltonian_eval = sample_hamiltonian(
+            hamiltonian=self.hamiltonian, ansatz=qc, backend=self.backend
+        )
         cost += hamiltonian_eval
 
-        
-        return - cost
+        return -cost
 
     def _excited_state_optimizer(self, index) -> (float, QuantumCircuit):
         cost = partial(self._cost_excited_state, index)
 
         params = np.random.rand(self.n_parameters)
 
-        optimal_params, energy, n_iters = self.optimizer.optimize(num_vars=self.n_parameters, 
-                                                             objective_function=cost, 
-                                                             initial_point=params)
-        
+        optimal_params, energy, n_iters = self.optimizer.optimize(
+            num_vars=self.n_parameters,
+            objective_function=cost,
+            initial_point=params,
+        )
+
         state = self._construct_states()[index]
         return energy, self._apply_varform_params(state, optimal_params)
 
-    def run(self, index:int) -> (float, QuantumCircuit):
+    def run(self, index: int) -> (float, QuantumCircuit):
         """Run SSVQE for a given index.
 
         Args:
@@ -230,18 +229,20 @@ class SSVQE(object):
         energy, state = self._excited_state_optimizer(index)
         return energy, state
 
+
 if __name__ == "__main__":
+    import qiskit
     from qiskit import BasicAer
-    optimizer = qiskit.aqua.components.optimizers.COBYLA(maxiter=100)
 
-    backend = QuantumInstance(backend=BasicAer.get_backend('qasm_simulator'),
-                    shots=10000)
+    optimizer = qiskit.algorithms.optimizers.COBYLA(maxiter=100)
 
-    hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
-    ansatz = TwoLocal(hamiltonian.num_qubits, ['ry','rz'], 'cx', reps=1)
+    backend = QuantumInstance(
+        backend=BasicAer.get_backend("qasm_simulator"), shots=10000
+    )
+
+    hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
+    ansatz = TwoLocal(hamiltonian.num_qubits, ["ry", "rz"], "cx", reps=1)
     algo = SSVQE(hamiltonian, ansatz, backend, optimizer)
     energy, state = algo.run(1)
     print(energy)
     print(state)
-
-    
