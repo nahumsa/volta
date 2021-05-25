@@ -32,7 +32,7 @@ mypy-extensions==0.4.3
 nest-asyncio==1.5.1
 nox==2020.12.31
 ntlm-auth==1.5.0
-numpy==1.20.1
+numpy
 packaging==20.9
 pandas==1.2.3
 pathspec==0.8.1
