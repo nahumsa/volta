@@ -7,9 +7,7 @@ from typing import Union
 import textwrap
 
 
-def swap_test_circuit(
-    qc1: QuantumCircuit, qc2: QuantumCircuit
-) -> QuantumCircuit:
+def swap_test_circuit(qc1: QuantumCircuit, qc2: QuantumCircuit) -> QuantumCircuit:
     """Construct the SWAP test circuit given two circuits.
 
     Args:
@@ -81,9 +79,7 @@ def measure_swap_test(
     return 2 * (p_0 - 1 / 2)
 
 
-def dswap_test_circuit(
-    qc1: QuantumCircuit, qc2: QuantumCircuit
-) -> QuantumCircuit:
+def dswap_test_circuit(qc1: QuantumCircuit, qc2: QuantumCircuit) -> QuantumCircuit:
     """Construct the destructive SWAP test circuit given two circuits.
 
     Args:

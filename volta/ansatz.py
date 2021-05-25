@@ -1,7 +1,3 @@
-import sys
-
-sys.path.append("../")
-
 from qiskit.circuit.library import TwoLocal
 
 
@@ -25,9 +21,7 @@ def get_var_form(params, n_qubits=2):
     var_form_params = sorted(var_form.parameters, key=lambda p: p.name)
 
     # Check if the number of parameters is compatible
-    assert len(var_form_params) == len(
-        params
-    ), "The number of parameters don't match"
+    assert len(var_form_params) == len(params), "The number of parameters don't match"
 
     # Create a dictionary with the parameters and values
     param_dict = dict(zip(var_form_params, params))

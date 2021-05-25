@@ -5,8 +5,6 @@ from typing import Union
 
 from qiskit import QuantumCircuit
 from qiskit.opflow import OperatorBase, ListOp, PrimitiveOp, PauliOp
-from qiskit.opflow import I, X, Y, Z
-from qiskit.circuit.library import TwoLocal
 from qiskit.algorithms.optimizers import Optimizer
 from qiskit.aqua import QuantumInstance
 from qiskit.providers import BaseBackend
@@ -142,13 +140,9 @@ class VQD(object):
         if len(self.states) != 0:
             for state in self.states:
                 if self.dswap:
-                    swap = measure_dswap_test(
-                        qc, state, self.backend, self.NUM_SHOTS
-                    )
+                    swap = measure_dswap_test(qc, state, self.backend, self.NUM_SHOTS)
                 else:
-                    swap = measure_swap_test(
-                        qc, state, self.backend, self.NUM_SHOTS
-                    )
+                    swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
                 fidelity += swap
 
                 if self._debug:
@@ -192,8 +186,3 @@ class VQD(object):
                 print(f"Calculating excited state {i}")
 
             self.optimizer_run()
-
-
-##############
-## End code ##
-##############

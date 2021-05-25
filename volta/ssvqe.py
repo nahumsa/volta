@@ -1,15 +1,12 @@
 import numpy as np
-from typing import Union
 import textwrap
+from typing import Union
+
 from functools import partial
-
-import sys
-
-sys.path.append("./")
 
 from qiskit import QuantumCircuit
 from qiskit.opflow import OperatorBase, ListOp, PrimitiveOp, PauliOp
-from qiskit.opflow import I, X, Y, Z
+from qiskit.opflow import I, Z
 from qiskit.circuit.library import TwoLocal
 from qiskit.algorithms.optimizers import Optimizer
 from qiskit.utils import QuantumInstance
@@ -64,9 +61,7 @@ class SSVQE(object):
         self._inate_optimizer_run()
 
     def _create_blank_circuit(self) -> list:
-        return [
-            QuantumCircuit(self.n_qubits) for _ in range(2 ** self.n_qubits)
-        ]
+        return [QuantumCircuit(self.n_qubits) for _ in range(2 ** self.n_qubits)]
 
     def _copy_unitary(self, list_states: list) -> list:
         out_states = []

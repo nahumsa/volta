@@ -1,13 +1,6 @@
-import sys
-
-sys.path.append("../")
-
-from typing import Union
-
-import numpy as np
-
 import qiskit
-from qiskit import Aer, execute
+
+from qiskit import execute
 
 # Observables made by hand, those observables are changed
 # for the more general function sample_hamiltonian
@@ -39,9 +32,7 @@ def measure_zz(qc, backend, shots=10000):
     """Measure the ZZ expectation value for a given circuit."""
     zz_circuit = _measure_zz_circuit(qc)
 
-    count = (
-        execute(zz_circuit, backend=backend, shots=shots).result().get_counts()
-    )
+    count = execute(zz_circuit, backend=backend, shots=shots).result().get_counts()
     count = _clear_counts(count)
 
     # Get total counts in order to obtain the probability
@@ -55,9 +46,7 @@ def measure_zi(qc, backend, shots=10000):
     """Measure the ZI expectation value for a given circuit."""
     zi_circuit = _measure_zz_circuit(qc)
 
-    count = (
-        execute(zi_circuit, backend=backend, shots=shots).result().get_counts()
-    )
+    count = execute(zi_circuit, backend=backend, shots=shots).result().get_counts()
     count = _clear_counts(count)
 
     # Get total counts in order to obtain the probability
@@ -71,9 +60,7 @@ def measure_iz(qc, backend, shots=10000):
     """Measure the IZ expectation value for a given circuit."""
     iz_circuit = _measure_zz_circuit(qc)
 
-    count = (
-        execute(iz_circuit, backend=backend, shots=shots).result().get_counts()
-    )
+    count = execute(iz_circuit, backend=backend, shots=shots).result().get_counts()
     count = _clear_counts(count)
 
     # Get total counts in order to obtain the probability
@@ -98,9 +85,7 @@ def measure_xx(qc, backend, shots=10000):
 
     xx_circuit = _measure_xx_circuit(qc)
 
-    count = (
-        execute(xx_circuit, backend=backend, shots=shots).result().get_counts()
-    )
+    count = execute(xx_circuit, backend=backend, shots=shots).result().get_counts()
     count = _clear_counts(count)
 
     # Get total counts in order to obtain the probability
@@ -127,9 +112,7 @@ def measure_yy(qc, backend, shots=10000):
 
     yy_circuit = _measure_yy_circuit(qc)
 
-    count = (
-        execute(yy_circuit, backend=backend, shots=shots).result().get_counts()
-    )
+    count = execute(yy_circuit, backend=backend, shots=shots).result().get_counts()
     count = _clear_counts(count)
 
     # Get total counts in order to obtain the probability

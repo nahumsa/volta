@@ -1,15 +1,12 @@
 from typing import Union
 import qiskit
 import numpy as np
-from qiskit import Aer, execute
 from qiskit.utils.backend_utils import is_aer_provider
 from qiskit.opflow import (
-    PauliExpectation,
     CircuitSampler,
     ExpectationFactory,
     CircuitStateFn,
     StateFn,
-    ListOp,
 )
 
 import sys
@@ -24,18 +21,12 @@ def sample_hamiltonian(
 ):
 
     if qiskit.utils.quantum_instance.QuantumInstance == type(backend):
-        sampler = CircuitSampler(
-            backend, param_qobj=is_aer_provider(backend.backend)
-        )
+        sampler = CircuitSampler(backend, param_qobj=is_aer_provider(backend.backend))
     else:
         sampler = CircuitSampler(backend)
 
-    expectation = ExpectationFactory.build(
-        operator=hamiltonian, backend=backend
-    )
-    observable_meas = expectation.convert(
-        StateFn(hamiltonian, is_measurement=True)
-    )
+    expectation = ExpectationFactory.build(operator=hamiltonian, backend=backend)
+    observable_meas = expectation.convert(StateFn(hamiltonian, is_measurement=True))
 
     ansatz_circuit_op = CircuitStateFn(ansatz)
 
