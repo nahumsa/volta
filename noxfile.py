@@ -17,4 +17,4 @@ def black_check(session):
     """ Install all requirements, run pytest.
     """
     session.install("black")
-    session.run("black", "--check", "--diff")
+    session.run("black", "--check", "--diff", "tests", "volta")
