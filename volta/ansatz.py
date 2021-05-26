@@ -11,7 +11,8 @@ from qiskit.circuit.library import TwoLocal
 from qiskit import QuantumCircuit
 import numpy as np
 
-def _get_ansatz(n_qubits: int, reps: int=1) -> QuantumCircuit:
+
+def _get_ansatz(n_qubits: int, reps: int = 1) -> QuantumCircuit:
     """Create a TwoLocal ansatz for `n_qubits`.
 
     Args:
@@ -36,7 +37,7 @@ def get_num_parameters(n_qubits: int) -> int:
     return len(_get_ansatz(n_qubits).parameters)
 
 
-def get_var_form(params: np.array, n_qubits: int=2, reps: int=1) -> QuantumCircuit:
+def get_var_form(params: np.array, n_qubits: int = 2, reps: int = 1) -> QuantumCircuit:
     """Get an hardware-efficient ansatz for n_qubits
     given parameters.
 

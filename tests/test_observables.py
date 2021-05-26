@@ -18,7 +18,6 @@ from volta.observables import sample_hamiltonian
 
 
 class TestObservables(unittest.TestCase):
-    
     def setUp(self):
         # Simulator
         self.backend = QuantumInstance(

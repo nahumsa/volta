@@ -26,7 +26,7 @@ class TestVQDSWAP(unittest.TestCase):
         optimizer = qiskit.algorithms.optimizers.COBYLA()
         # backend = BasicAer.get_backend("qasm_simulator")
         backend = QuantumInstance(
-            backend=BasicAer.get_backend("qasm_simulator"), shots=10000
+            backend=BasicAer.get_backend("qasm_simulator"), shots=50000
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
@@ -68,7 +68,7 @@ class TestVQDDSWAP(unittest.TestCase):
         optimizer = qiskit.algorithms.optimizers.COBYLA()
         # backend = BasicAer.get_backend("qasm_simulator")
         backend = QuantumInstance(
-            backend=BasicAer.get_backend("qasm_simulator"), shots=10000
+            backend=BasicAer.get_backend("qasm_simulator"), shots=50000
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
