@@ -13,6 +13,10 @@ I plan to implement Hamiltonian Simulation algorithms as well as noise mitigatio
 - Variational Quantum Deflation based on https://arxiv.org/abs/1805.08138.
 - Subspace-search variational quantum eigensolver for excited states based on https://arxiv.org/abs/1810.09434. **Work In Progress**.
 
+## SWAP test
+
+- SWAP test using controlled swaps;
+- Destructive SWAP test;
 
 ## Hamiltonian Simulation
 
