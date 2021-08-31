@@ -146,7 +146,7 @@ class TestVQDAmplitude(unittest.TestCase):
             want,
             got,
             decimal_place,
-            "VQD with DSWAP not working for the ground state of 1/2*((Z^I) + (Z^Z))",
+            "VQD with Excitation Amplitude not working for the ground state of 1/2*((Z^I) + (Z^Z))",
         )
 
     def test_energies_1(self):
@@ -158,7 +158,7 @@ class TestVQDAmplitude(unittest.TestCase):
             want,
             got,
             decimal_place,
-            "VQD with DSWAP not working for the first excited state of 1/2*((Z^I) + (Z^Z))",
+            "VQD with Excitation Amplitude not working for the first excited state of 1/2*((Z^I) + (Z^Z))",
         )
 
 
