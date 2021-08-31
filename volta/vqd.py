@@ -20,7 +20,11 @@ from qiskit.providers import BaseBackend
 
 
 from volta.observables import sample_hamiltonian
-from volta.swaptest import measure_swap_test, measure_dswap_test
+from volta.swaptest import (
+    measure_swap_test,
+    measure_dswap_test,
+    measure_amplitude_transition_test,
+)
 
 
 class VQD(object):
@@ -38,7 +42,7 @@ class VQD(object):
         beta: float,
         optimizer: Optimizer,
         backend: Union[BaseBackend, QuantumInstance],
-        dswap: bool = False,
+        overlap_method: str = "swap",
         num_shots: int = 10000,
         debug: bool = False,
     ) -> None:
@@ -51,9 +55,10 @@ class VQD(object):
             n_excited_states (int): Number of excited states that you want to find the energy
             if you use 0, then it is the same as using a VQE.
             beta (float): Strenght parameter for the swap test.
-            optimizer (qiskit.aqua.components.optimizers.Optimizer): Classical Optimizers
-            from aqua components.
+            optimizer (qiskit.algorithms.optimizers.Optimizer): Classical Optimizers
+            from Terra.
             backend (Union[BaseBackend, QuantumInstance]): Backend for running the algorithm.
+            overlap_method (str): State overlap method. Methods available: swap, dswap, amplitude (Default: swap)
             num_shots (int): Number of shots. (Default: 10000)
         """
 
@@ -64,7 +69,13 @@ class VQD(object):
         self.backend = backend
         self.NUM_SHOTS = num_shots
         self.BETA = beta
-        self.dswap = dswap
+        self.overlap_method = overlap_method
+
+        IMPLEMENTED_OVERLAP_METHODS = ["swap", "dswap", "amplitude"]
+        if self.overlap_method not in IMPLEMENTED_OVERLAP_METHODS:
+            raise NotImplementedError(
+                f"overlapping method not implemented. Available implementing methods: {IMPLEMENTED_OVERLAP_METHODS}"
+            )
 
         # Helper Parameters
         self.n_excited_states = n_excited_states + 1
@@ -148,10 +159,14 @@ class VQD(object):
         fidelity = 0.0
         if len(self.states) != 0:
             for state in self.states:
-                if self.dswap:
+                if self.overlap_method == "dswap":
                     swap = measure_dswap_test(qc, state, self.backend, self.NUM_SHOTS)
-                else:
+                elif self.overlap_method == "swap":
                     swap = measure_swap_test(qc, state, self.backend, self.NUM_SHOTS)
+                elif self.overlap_method == "amplitude":
+                    swap = measure_amplitude_transition_test(
+                        qc, state, self.backend, self.NUM_SHOTS
+                    )
                 fidelity += swap
 
                 if self._debug:

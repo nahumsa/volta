@@ -163,3 +163,63 @@ def measure_dswap_test(
     total = sum(count.values())
 
     return result / (n * total)
+
+
+def amplitude_transition_test_circuit(
+    qc1: QuantumCircuit, qc2: QuantumCircuit
+) -> QuantumCircuit:
+    """Construct the SWAP test circuit given two circuits using amplitude transition.
+    Args:
+        qc1(qiskit.QuantumCircuit): Quantum circuit for the
+        first state.
+        qc2(qiskit.QuantumCircuit): Quantum circuit for the
+        second state.
+    Output:
+        (qiskit.QuantumCircuit): swap test circuit.
+    """
+
+    # Constructing the SWAP test circuit
+    n_qubits = qc1.num_qubits
+    qc_swap = QuantumCircuit(n_qubits)
+    qc_swap.append(qc1, range(n_qubits))
+    qc_swap.append(qc2.inverse(), range(n_qubits))
+
+    # Measurement on the auxiliary qubit
+    qc_swap.measure_all()
+    return qc_swap
+
+
+def measure_amplitude_transition_test(
+    qc1: QuantumCircuit,
+    qc2: QuantumCircuit,
+    backend,
+    num_shots: int = 10000,
+) -> float:
+    """Returns the fidelity from a SWAP test using amplitude transition.
+    Args:
+        qc1 (QuantumCircuit): Quantum Circuit for the first state.
+        qc2 (QuantumCircuit): Quantum Circuit for the second state.
+        backend (Union[BaseBackend,QuantumInstance]): Backend.
+        num_shots (int, optional): Number of shots. Defaults to 10000.
+    Returns:
+        float: result of the overlap betweeen the first and second state.
+    """
+    swap_circuit = amplitude_transition_test_circuit(qc1, qc2)
+
+    # Check if the backend is a quantum instance.
+    if qiskit.utils.quantum_instance.QuantumInstance == type(backend):
+        count = backend.execute(swap_circuit).get_counts()
+    else:
+        count = (
+            execute(swap_circuit, backend=backend, shots=num_shots)
+            .result()
+            .get_counts()
+        )
+
+    if "0" * qc1.num_qubits not in count:
+        count["0" * qc1.num_qubits] = 0
+
+    total_counts = sum(count.values())
+    fid_meas = count["0" * qc1.num_qubits]
+    p_0 = fid_meas / total_counts
+    return p_0
