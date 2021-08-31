@@ -171,12 +171,7 @@ class VQDRaiseError(unittest.TestCase):
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
         ansatz = TwoLocal(hamiltonian.num_qubits, ["ry", "rz"], "cx", reps=2)
-
-        IMPLEMENTED_OVERLAP_METHODS = ["swap", "dswap", "amplitude"]
-        self.assertRaises(
-            NotImplementedError(
-                f"overlapping method not implemented. Available implementing methods: {IMPLEMENTED_OVERLAP_METHODS}"
-            ),
+        with self.assertRaises(NotImplementedError):
             VQD(
                 hamiltonian=hamiltonian,
                 ansatz=ansatz,
@@ -186,7 +181,6 @@ class VQDRaiseError(unittest.TestCase):
                 backend=backend,
                 overlap_method="test",
             ),
-        )
 
 
 if __name__ == "__main__":
