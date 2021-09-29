@@ -19,30 +19,31 @@ from qiskit.opflow import Z, I
 from volta.ssvqe import SSVQE
 from volta.utils import classical_solver
 
-class TestSSVQD(unittest.TestCase):
 
+class TestSSVQD(unittest.TestCase):
     def setUp(self):
 
         optimizer = qiskit.algorithms.optimizers.COBYLA()
 
         backend = QuantumInstance(
-                      backend=Aer.get_backend('qasm_simulator'),
-                      shots=10000)
+            backend=Aer.get_backend("qasm_simulator"), shots=10000
+        )
 
-        hamiltonian = (1/2*(Z^I) + 1/2*(Z^Z))
-        ansatz = TwoLocal(hamiltonian.num_qubits, ['ry','rz'], 'cx', reps=2)
+        hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
+        ansatz = TwoLocal(hamiltonian.num_qubits, ["ry", "rz"], "cx", reps=2)
 
-        self.Algo = SSVQE(hamiltonian=hamiltonian,
-                          ansatz = ansatz,
-                          optimizer=optimizer,
-                          n_excited=2,
-                          backend=backend)
+        self.Algo = SSVQE(
+            hamiltonian=hamiltonian,
+            ansatz=ansatz,
+            optimizer=optimizer,
+            n_excited=2,
+            backend=backend,
+        )
 
         self.energy = []
         self.energy.append(self.Algo.run(index=0)[0])
         self.energy.append(self.Algo.run(index=1)[0])
         self.eigenvalues, _ = classical_solver(hamiltonian)
-
 
     def test_energies(self):
         want = self.eigenvalues[0]

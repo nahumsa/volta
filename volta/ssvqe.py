@@ -73,14 +73,14 @@ class SSVQE(object):
         return [QuantumCircuit(self.n_qubits) for _ in range(self._n_excited)]
 
     def _copy_unitary(self, list_states: list) -> list:
-        
+
         out_states = []
         for state in list_states:
             out_states.append(state.copy())
         return out_states
 
     def _apply_initialization(self, list_states: list) -> None:
-        
+
         for ind, state in enumerate(list_states):
             b = bin(ind)[2:]
             if len(b) != self.n_qubits:
@@ -133,7 +133,7 @@ class SSVQE(object):
         circuit = self._create_blank_circuit()
 
         self._apply_initialization(circuit)
-        
+
         self._apply_ansatz(circuit)
 
         return circuit
@@ -152,9 +152,9 @@ class SSVQE(object):
         states = self._construct_states()
 
         cost = 0
-        
+
         w = np.arange(len(states), 0, -1)
-        
+
         for i, state in enumerate(states):
             qc = self._apply_varform_params(state, params)
 
