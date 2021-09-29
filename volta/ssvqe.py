@@ -38,6 +38,7 @@ class SSVQE(object):
         ansatz: QuantumCircuit,
         backend: Union[BaseBackend, QuantumInstance],
         optimizer: Optimizer,
+        n_excited: int,
         debug: bool = False,
     ) -> None:
         """Initialize the class.
@@ -62,23 +63,24 @@ class SSVQE(object):
         self.n_parameters = self._get_num_parameters
         self._debug = debug
 
-        #
         self._ansatz_1_params = None
         self._first_optimization = False
-
+        self._n_excited = n_excited
         # Running inate functions
         self._inate_optimizer_run()
 
     def _create_blank_circuit(self) -> list:
-        return [QuantumCircuit(self.n_qubits) for _ in range(2 ** self.n_qubits)]
+        return [QuantumCircuit(self.n_qubits) for _ in range(self._n_excited)]
 
     def _copy_unitary(self, list_states: list) -> list:
+        
         out_states = []
         for state in list_states:
             out_states.append(state.copy())
         return out_states
 
     def _apply_initialization(self, list_states: list) -> None:
+        
         for ind, state in enumerate(list_states):
             b = bin(ind)[2:]
             if len(b) != self.n_qubits:
@@ -131,22 +133,8 @@ class SSVQE(object):
         circuit = self._create_blank_circuit()
 
         self._apply_initialization(circuit)
-
-        if self._first_optimization:
-            self._apply_ansatz(circuit, "V(ϕ)")
-
-        if type(self._ansatz_1_params) != type(np.array([])):
-            self._apply_ansatz(circuit)
-
-        else:
-            aux_circuit = [QuantumCircuit(self.n_qubits)]
-            self._apply_ansatz(aux_circuit, "U(θ)")
-            aux_circuit = self._apply_varform_params(
-                aux_circuit[0], self._ansatz_1_params
-            )
-            aux_circuit.name = "U(θ)"
-            for states in circuit:
-                states.append(aux_circuit, range(self.n_qubits))
+        
+        self._apply_ansatz(circuit)
 
         return circuit
 
@@ -164,7 +152,10 @@ class SSVQE(object):
         states = self._construct_states()
 
         cost = 0
-        for state in states:
+        
+        w = np.arange(len(states), 0, -1)
+        
+        for i, state in enumerate(states):
             qc = self._apply_varform_params(state, params)
 
             # Hamiltonian
@@ -172,7 +163,7 @@ class SSVQE(object):
                 hamiltonian=self.hamiltonian, ansatz=qc, backend=self.backend
             )
 
-            cost += hamiltonian_eval
+            cost += w[i] * hamiltonian_eval
 
         return cost
 
@@ -204,21 +195,7 @@ class SSVQE(object):
         )
         cost += hamiltonian_eval
 
-        return -cost
-
-    def _excited_state_optimizer(self, index) -> (float, QuantumCircuit):
-        cost = partial(self._cost_excited_state, index)
-
-        params = np.random.rand(self.n_parameters)
-
-        optimal_params, energy, n_iters = self.optimizer.optimize(
-            num_vars=self.n_parameters,
-            objective_function=cost,
-            initial_point=params,
-        )
-
-        state = self._construct_states()[index]
-        return energy, self._apply_varform_params(state, optimal_params)
+        return cost, qc
 
     def run(self, index: int) -> (float, QuantumCircuit):
         """Run SSVQE for a given index.
@@ -230,7 +207,7 @@ class SSVQE(object):
             Energy: Energy of such excited state.
             State: State for such energy.
         """
-        energy, state = self._excited_state_optimizer(index)
+        energy, state = self._cost_excited_state(index, self._ansatz_1_params)
         return energy, state
 
 
