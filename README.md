@@ -11,7 +11,7 @@ I plan to implement Hamiltonian Simulation algorithms as well as noise mitigatio
 ## Variational Quantum Algorithms
 
 - Variational Quantum Deflation based on https://arxiv.org/abs/1805.08138.
-- Subspace-search variational quantum eigensolver for excited states based on https://arxiv.org/abs/1810.09434. **Work In Progress**.
+- Subspace-search variational quantum eigensolver for excited states based on https://arxiv.org/abs/1810.09434. 
 
 ## SWAP test
 
