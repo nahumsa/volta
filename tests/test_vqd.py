@@ -24,9 +24,11 @@ from volta.utils import classical_solver
 class TestVQDSWAP(unittest.TestCase):
     def setUp(self):
         optimizer = qiskit.algorithms.optimizers.COBYLA()
-        # backend = BasicAer.get_backend("qasm_simulator")
         backend = QuantumInstance(
-            backend=BasicAer.get_backend("qasm_simulator"), shots=50000
+            backend=BasicAer.get_backend("qasm_simulator"),
+            shots=50000,
+            seed_simulator=42,
+            seed_transpiler=42
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
@@ -69,7 +71,10 @@ class TestVQDDSWAP(unittest.TestCase):
         optimizer = qiskit.algorithms.optimizers.COBYLA()
         # backend = BasicAer.get_backend("qasm_simulator")
         backend = QuantumInstance(
-            backend=BasicAer.get_backend("qasm_simulator"), shots=50000
+            backend=BasicAer.get_backend("qasm_simulator"),
+            shots=50000,
+            seed_simulator=42,
+            seed_transpiler=42
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
@@ -116,9 +121,11 @@ class TestVQDDSWAP(unittest.TestCase):
 class TestVQDAmplitude(unittest.TestCase):
     def setUp(self):
         optimizer = qiskit.algorithms.optimizers.COBYLA()
-        # backend = BasicAer.get_backend("qasm_simulator")
         backend = QuantumInstance(
-            backend=BasicAer.get_backend("qasm_simulator"), shots=50000
+            backend=BasicAer.get_backend("qasm_simulator"),
+            shots=50000,
+            seed_simulator=42,
+            seed_transpiler=42
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
