@@ -28,7 +28,7 @@ class TestVQDSWAP(unittest.TestCase):
             backend=BasicAer.get_backend("qasm_simulator"),
             shots=50000,
             seed_simulator=42,
-            seed_transpiler=42
+            seed_transpiler=42,
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
@@ -74,7 +74,7 @@ class TestVQDDSWAP(unittest.TestCase):
             backend=BasicAer.get_backend("qasm_simulator"),
             shots=50000,
             seed_simulator=42,
-            seed_transpiler=42
+            seed_transpiler=42,
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
@@ -125,7 +125,7 @@ class TestVQDAmplitude(unittest.TestCase):
             backend=BasicAer.get_backend("qasm_simulator"),
             shots=50000,
             seed_simulator=42,
-            seed_transpiler=42
+            seed_transpiler=42,
         )
 
         hamiltonian = 1 / 2 * (Z ^ I) + 1 / 2 * (Z ^ Z)
